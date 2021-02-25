@@ -259,7 +259,7 @@ void SSDPClass::_send(ssdp_method_t method)
     _server->endPacket();
 }
 
-const char * SSDPClass::schema()
+const char * SSDPClass::schema(bool description_only= false)
 {
     uint len = strlen(_ssdp_schema_template)
                + 21 //(IP = 15) + 1 (:) + 5 (port)
@@ -282,8 +282,14 @@ const char * SSDPClass::schema()
     }
     _schema = (char *)malloc(len+1);
     if (_schema) {
-        IPAddress ip = localIP();
-        sprintf(_schema, _ssdp_schema_template,
+        char * templ = (description_only) ? strstr( _ssdp_schema_template , "<?xml")  : _ssdp_schema_template;
+        if(!templ){
+            free (_schema);
+            _schema = nullptr;
+        }
+        else{
+            IPAddress ip = localIP();
+            sprintf(_schema, templ,
                 ip[0], ip[1], ip[2], ip[3], _port,
                 _deviceType,
                 _friendlyName,
@@ -299,6 +305,7 @@ const char * SSDPClass::schema()
                 _services.c_str(),
                 _icons.c_str()
                );
+        }
     } else {
 #ifdef DEBUG_SSDP
         DEBUG_SSDP.println("not enough memory for schema");
