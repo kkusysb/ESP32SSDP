@@ -259,7 +259,7 @@ void SSDPClass::_send(ssdp_method_t method)
     _server->endPacket();
 }
 
-const char * SSDPClass::schema(bool description_only= false)
+const char * SSDPClass::schema(bool description_only)
 {
     uint len = strlen(_ssdp_schema_template)
                + 21 //(IP = 15) + 1 (:) + 5 (port)
@@ -282,7 +282,7 @@ const char * SSDPClass::schema(bool description_only= false)
     }
     _schema = (char *)malloc(len+1);
     if (_schema) {
-        char * templ = (description_only) ? strstr( _ssdp_schema_template , "<?xml")  : _ssdp_schema_template;
+        char * templ = (description_only) ? strstr( _ssdp_schema_template , "<?xml")  : (char *) _ssdp_schema_template;
         if(!templ){
             free (_schema);
             _schema = nullptr;
